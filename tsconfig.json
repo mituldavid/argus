@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"target": "es2016",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"rootDir": ".",
+		"outDir": "build",
+		"pretty": true,
+		"strict": true,
+		"noUnusedLocals": true,
+		"noImplicitReturns": true,
+		"allowUnreachableCode": false,
+		"noFallthroughCasesInSwitch": true,
+		"forceConsistentCasingInFileNames": true,
+		"sourceMap": true,
+		"declaration": true,
+		"noEmitOnError": true,
+		"lib": ["ES2016"],
+		"skipLibCheck": true,
+		"types": ["node"]
+	},
+	"include": ["src/**/*.ts", "test/**/*.ts"],
+	"ts-node": {
+		"swc": true
+	}
+}
