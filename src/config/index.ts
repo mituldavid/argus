@@ -9,6 +9,10 @@ const global = {
 	mongo: {
 		uri: process.env.MONGODB_URI,
 	},
+	ntfy: {
+		url: process.env.NTFY_URL || 'https://ntfy.sh',
+		topic: process.env.NTFY_TOPIC,
+	},
 };
 
 // Development-Specific Configuration

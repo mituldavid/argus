@@ -1,3 +1,5 @@
+import { NtfyAction } from './ntfy';
+
 export interface MarketOverviewStructure {
 	fii: number;
 	skew: number;
@@ -20,4 +22,15 @@ export interface NotificationLogStructure {
 	nextIndexValue: number;
 	threshold: number;
 	notifiedOn: Date;
+}
+
+export interface NotificationPayload {
+	message: string;
+	title: string;
+	tags?: string[];
+	priority?: number;
+	attach?: string;
+	filename?: string;
+	click?: string;
+	actions?: NtfyAction[];
 }
