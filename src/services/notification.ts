@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import { differenceInHours } from 'date-fns';
+import { createLogMessage } from './utilities';
 import { NotificationPayload } from '../types';
 import NotificationLog from '../database/models/NotificationLog';
 
@@ -60,6 +61,7 @@ const notifyChangesToMMI = async (previousIndexValue: number, currentIndexValue:
 				{ previousIndexValue, currentIndexValue, threshold },
 				{ upsert: true },
 			);
+			console.info(createLogMessage('NOTIFICATION SENT'));
 			break;
 		}
 	}
