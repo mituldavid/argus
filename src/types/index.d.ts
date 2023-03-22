@@ -17,6 +17,15 @@ export interface MarketOverviewStructure {
 	indicator: number;
 }
 
+export interface MarketMoodIndex extends MarketOverviewStructure {
+	daily: { value: number; date: Date }[];
+	lastDay: MarketOverviewStructure;
+	lastWeek: MarketOverviewStructure;
+	lastMonth: MarketOverviewStructure;
+	lastYear: MarketOverviewStructure;
+	currentValue: number;
+}
+
 export interface NotificationLogStructure {
 	previousIndexValue: number;
 	nextIndexValue: number;
