@@ -3,6 +3,7 @@ import config from '../config';
 
 const createDatabaseConnection = async () => {
 	try {
+		mongoose.set('strictQuery', false);
 		const connection = await mongoose.connect(config.mongo.uri as string, {
 			tls: true,
 		});
