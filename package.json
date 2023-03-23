@@ -4,7 +4,10 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"prepare": "husky install"
+		"start": "node build/src/index.js",
+		"dev": "ts-node src/index.ts",
+		"build": "npx tsc -p tsconfig.json && cp .env ./build",
+		"prepare": "(node -e \"if (process.env.NODE_ENV !== 'production'){process.exit(1)} \" || husky install)"
 	},
 	"author": "mituldavid",
 	"license": "UNLICENSED",
