@@ -56,7 +56,7 @@ const notifyChangesToMMI = async (previousIndexValue: number, currentIndexValue:
 				title: `MMI has sunk below ${threshold}`,
 				click: 'https://stocks.zerodha.com',
 			});
-			await NotificationLog.findOneAndUpdate(
+			await NotificationLog.updateOne(
 				{},
 				{ previousIndexValue, currentIndexValue, threshold },
 				{ upsert: true },

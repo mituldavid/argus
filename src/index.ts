@@ -17,14 +17,12 @@ const job = async () => {
 		console.info(createLogMessage('JOB STARTING'));
 		const MMI = await getMarketMoodIndex();
 		const previousMarketOverview = await MarketOverview.findOne()
-			.sort('-updatedAt')
+			.sort('-date')
 			.select('indicator')
 			.lean();
 
 		const currentMarketOverview = await saveCurrentMarketOverview(MMI);
-		const pastMarketOverviews = await savePastMarketOverviews(MMI);
-		if (!currentMarketOverview) throw new Error('Could not save current market overview');
-		if (!pastMarketOverviews) throw new Error('Could not save past market overviews');
+		await savePastMarketOverviews(MMI);
 		console.info(createLogMessage('DATA UPDATED IN DB'));
 
 		if (previousMarketOverview)
