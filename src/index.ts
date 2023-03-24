@@ -3,18 +3,19 @@ import {
 	savePastMarketOverviews,
 	saveCurrentMarketOverview,
 } from './services/market';
-import createDatabaseConnection from './database';
-import { scheduleJob, Range, gracefulShutdown } from 'node-schedule';
 import { createLogMessage } from './services/utilities';
 import { notify, notifyChangesToMMI } from './services/notification';
+
+import createDatabaseConnection from './database';
 import MarketOverview from './database/models/MarketOverview';
+
+import { scheduleJob, Range, gracefulShutdown } from 'node-schedule';
 
 createDatabaseConnection();
 
-const job = async () => {
+const syncLiveData = async () => {
 	try {
-		console.group(' ');
-		console.info(createLogMessage('JOB STARTING'));
+		console.info(createLogMessage('SYNCING LIVE DATA'));
 		const MMI = await getMarketMoodIndex();
 		const previousMarketOverview = await MarketOverview.findOne()
 			.sort('-date')
@@ -22,25 +23,39 @@ const job = async () => {
 			.lean();
 
 		const currentMarketOverview = await saveCurrentMarketOverview(MMI);
-		await savePastMarketOverviews(MMI);
 		console.info(createLogMessage('DATA UPDATED IN DB'));
 
 		if (previousMarketOverview)
 			await notifyChangesToMMI(previousMarketOverview.indicator, currentMarketOverview.indicator);
 
-		console.info(createLogMessage('JOB COMPLETED'));
-		console.groupEnd();
+		console.info(createLogMessage('COMPLETED'));
 	} catch (error: any) {
-		console.error(createLogMessage('ERROR:'), error);
+		console.error(createLogMessage('ERROR ENCOUNTERED WHILE SYNCING LIVE DATA:'), error);
 		notify({
 			message: error.toString(),
-			title: 'Error encountered while syncing market overview',
+			title: 'Error encountered while syncing live market overview',
 			priority: 5,
 		});
 	}
 };
 
-// Run job every two minutes from 9AM to 4PM on Monday to Friday
+const syncPastData = async () => {
+	try {
+		console.info(createLogMessage('SYNCING PAST DATA'));
+		const MMI = await getMarketMoodIndex();
+		await savePastMarketOverviews(MMI);
+		console.info(createLogMessage('COMPLETED'));
+	} catch (error: any) {
+		console.error(createLogMessage('ERROR ENCOUNTERED WHILE SYNCING PAST DATA:'), error);
+		notify({
+			message: error.toString(),
+			title: 'Error encountered while syncing past market overview',
+			priority: 5,
+		});
+	}
+};
+
+// Run every two minutes from 9AM to 4PM on Monday to Friday
 // Crontab equivalent = '*/2 9-16 * * 1-5'
 scheduleJob(
 	{
@@ -49,7 +64,18 @@ scheduleJob(
 		dayOfWeek: new Range(1, 5),
 		tz: 'Asia/Kolkata',
 	},
-	job,
+	syncLiveData,
+);
+
+// Run at 8AM everyday
+// Crontab equivalent = '0 8 * * *'
+scheduleJob(
+	{
+		minute: 0,
+		hour: 8,
+		tz: 'Asia/Kolkata',
+	},
+	syncPastData,
 );
 
 // Gracefully shutdown jobs when a system interrupt occurs
