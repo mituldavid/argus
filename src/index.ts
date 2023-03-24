@@ -4,7 +4,7 @@ import {
 	saveCurrentMarketOverview,
 } from './services/market';
 import createDatabaseConnection from './database';
-import { scheduleJob, Range } from 'node-schedule';
+import { scheduleJob, Range, gracefulShutdown } from 'node-schedule';
 import { createLogMessage } from './services/utilities';
 import { notify, notifyChangesToMMI } from './services/notification';
 import MarketOverview from './database/models/MarketOverview';
@@ -51,3 +51,10 @@ scheduleJob(
 	},
 	job,
 );
+
+// Gracefully shutdown jobs when a system interrupt occurs
+process.on('SIGINT', async () => {
+	console.info('SHUTTING DOWN JOBS GRACEFULLY');
+	await gracefulShutdown();
+	process.exit(0);
+});
