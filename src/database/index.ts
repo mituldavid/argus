@@ -5,7 +5,7 @@ const createDatabaseConnection = async () => {
 	try {
 		mongoose.set('strictQuery', false);
 		const connection = await mongoose.connect(config.mongo.uri as string, {
-			tls: true,
+			tls: config.mongo.tls,
 		});
 		console.info(`Connected to MongoDB - ${connection.connection.host}`);
 	} catch (error) {

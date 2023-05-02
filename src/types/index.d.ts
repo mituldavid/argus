@@ -28,7 +28,7 @@ export interface MarketMoodIndex extends MarketOverviewStructure {
 
 export interface NotificationLogStructure {
 	previousIndexValue: number;
-	nextIndexValue: number;
+	currentIndexValue: number;
 	threshold: number;
 	notifiedOn: Date;
 }

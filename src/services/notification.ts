@@ -1,10 +1,12 @@
 import axios from 'axios';
 import config from '../config';
 import { differenceInHours } from 'date-fns';
-import { createLogMessage } from './utilities';
 import { NotificationPayload } from '../types';
 import NotificationLog from '../database/models/NotificationLog';
 
+/**
+ * Wrapper to publish a ntfy message via HTTP
+ */
 const notify = async ({
 	message,
 	title,
@@ -36,16 +38,16 @@ const getHoursSinceLastNotification = async () => {
 	return Infinity;
 };
 
-const notifyChangesToMMI = async (previousIndexValue: number, currentIndexValue: number) => {
-	let hoursSinceLastNotification;
+/**
+ * Send a notification if the MMI has dropped below the set thresholds
+ */
+const notifyIfBelowThreshold = async (previousIndexValue: number, currentIndexValue: number) => {
 	const thresholds = [10, 15, 20, 25, 30];
+	const hoursSinceLastNotification = await getHoursSinceLastNotification();
 
 	for (const threshold of thresholds) {
 		let allowRepeatedNotification = false;
-		if (threshold <= 20) {
-			hoursSinceLastNotification ||= await getHoursSinceLastNotification();
-			allowRepeatedNotification = hoursSinceLastNotification > 24;
-		}
+		if (threshold <= 20) allowRepeatedNotification = hoursSinceLastNotification > 24;
 
 		if (
 			currentIndexValue < threshold &&
@@ -61,10 +63,10 @@ const notifyChangesToMMI = async (previousIndexValue: number, currentIndexValue:
 				{ previousIndexValue, currentIndexValue, threshold },
 				{ upsert: true },
 			);
-			console.info(createLogMessage('NOTIFICATION SENT'));
+			console.info('NOTIFICATION SENT');
 			break;
 		}
 	}
 };
 
-export { notify, notifyChangesToMMI, getHoursSinceLastNotification };
+export { notify, notifyIfBelowThreshold, getHoursSinceLastNotification };

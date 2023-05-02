@@ -8,6 +8,7 @@ const global = {
 	env: process.env.NODE_ENV,
 	mongo: {
 		uri: process.env.MONGODB_URI,
+		tls: true,
 	},
 	ntfy: {
 		url: process.env.NTFY_URL || 'https://ntfy.sh',

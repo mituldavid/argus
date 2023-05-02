@@ -2,7 +2,7 @@ import axios from 'axios';
 import { MarketMoodIndex } from '../types';
 import MarketOverview from '../database/models/MarketOverview';
 
-const getMarketMoodIndex = async () => {
+const getMarketMoodIndex = async (): Promise<MarketMoodIndex> => {
 	const response = await axios.get('https://api.tickertape.in/mmi/now');
 	return response.data.data;
 };

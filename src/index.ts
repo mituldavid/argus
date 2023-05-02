@@ -1,59 +1,9 @@
-import {
-	getMarketMoodIndex,
-	savePastMarketOverviews,
-	saveCurrentMarketOverview,
-} from './services/market';
-import { createLogMessage } from './services/utilities';
-import { notify, notifyChangesToMMI } from './services/notification';
-
+import syncPastData from './jobs/syncPastData';
+import syncLiveData from './jobs/syncLiveData';
 import createDatabaseConnection from './database';
-import MarketOverview from './database/models/MarketOverview';
-
-import { scheduleJob, Range, gracefulShutdown } from 'node-schedule';
+import { scheduleJob, gracefulShutdown, Range } from 'node-schedule';
 
 createDatabaseConnection();
-
-const syncLiveData = async () => {
-	try {
-		console.info(createLogMessage('SYNCING LIVE DATA'));
-		const MMI = await getMarketMoodIndex();
-		const previousMarketOverview = await MarketOverview.findOne()
-			.sort('-date')
-			.select('indicator')
-			.lean();
-
-		const currentMarketOverview = await saveCurrentMarketOverview(MMI);
-		console.info(createLogMessage('DATA UPDATED IN DB'));
-
-		if (previousMarketOverview)
-			await notifyChangesToMMI(previousMarketOverview.indicator, currentMarketOverview.indicator);
-
-		console.info(createLogMessage('COMPLETED'));
-	} catch (error: any) {
-		console.error(createLogMessage('ERROR ENCOUNTERED WHILE SYNCING LIVE DATA:'), error);
-		notify({
-			message: error.toString(),
-			title: 'Error encountered while syncing live market overview',
-			priority: 5,
-		});
-	}
-};
-
-const syncPastData = async () => {
-	try {
-		console.info(createLogMessage('SYNCING PAST DATA'));
-		const MMI = await getMarketMoodIndex();
-		await savePastMarketOverviews(MMI);
-		console.info(createLogMessage('COMPLETED'));
-	} catch (error: any) {
-		console.error(createLogMessage('ERROR ENCOUNTERED WHILE SYNCING PAST DATA:'), error);
-		notify({
-			message: error.toString(),
-			title: 'Error encountered while syncing past market overview',
-			priority: 5,
-		});
-	}
-};
 
 // Run every two minutes from 9AM to 4PM on Monday to Friday
 // Crontab equivalent = '*/2 9-16 * * 1-5'
