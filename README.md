@@ -1,4 +1,4 @@
-![argus](https://github.com/mituldavid/argus/assets/49085834/d5974f73-51b7-4ef1-a0cb-30e56a083fa0)
+![argus](https://github.com/mituldavid/argus/assets/49085834/4789626e-d771-4679-b956-4ae014b51a75)
 
 # About
 
