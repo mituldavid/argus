@@ -60,7 +60,7 @@ const notifyIfBelowThreshold = async (previousIndexValue: number, currentIndexVa
 			});
 			await NotificationLog.updateOne(
 				{},
-				{ previousIndexValue, currentIndexValue, threshold },
+				{ previousIndexValue, currentIndexValue, threshold, notifiedOn: new Date() },
 				{ upsert: true },
 			);
 			console.info('NOTIFICATION SENT');
